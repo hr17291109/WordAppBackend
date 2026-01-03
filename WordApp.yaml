@@ -1,0 +1,172 @@
+openapi: 3.0.3
+
+info:
+  title: Lesson - OpenAPI 3.0
+  version: 1.0.0
+tags:
+  - name: accounts
+    description: 全アカウントの情報
+components:
+  parameters:
+    account_id:
+      in: path
+      name: account_id
+      description: 取得対象のユーザーID
+      schema:
+        type: string
+      required: true
+paths:
+  /accounts:
+    post:
+      tags:
+        - accounts
+      summary: アカウントの新規作成
+      description: account_idとpasswordを設定し新しいアカウントを作成する
+      requestBody:
+        required: true
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              properties:
+                account_id:
+                  type: string
+                  description: アカウント名
+                password:
+                  type: string
+                  description: パスワード
+              required:
+                - account_id
+                - password
+      responses:
+        '200':
+          description: 成功
+        '409':
+          description: すでにaccount_idが存在したとき
+  /accounts/{account_id}:
+    get:
+      tags:
+        - accounts
+      summary: 単語帳を返す
+      description: 指定されたアカウントの単語帳を返す
+      parameters:
+        - in: path
+          name: account_id
+          description: account_id
+          schema:
+            type: string
+          required: true
+        - in: query
+          name: password
+          schema:
+            type: string
+          description: パスワード
+          required: true
+      responses:
+        '200':
+          description: 成功
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  account_id:
+                    type: string
+                    description: アカウントID
+                    example: hnitta
+                  words:
+                    type: array
+                    description: 単語帳
+                    items:
+                      type: object
+                      properties:
+                        en:
+                          type: string
+                          description: 英単語
+                          example: cosmology
+                        jp:
+                          type: string
+                          description: 日本語訳
+                          example: 宇宙論
+                      required:
+                        - en
+                        - jp
+        '401':
+          description: パスワード間違い
+        '404':
+          description: IDが存在しません
+  /accounts/{account_id}/password:
+    put:
+      tags:
+        - accounts
+      summary: パスワードを変更する
+      description: 指定されたIDのアカウントを変更する
+      parameters:
+        - $ref: "#/components/parameters/account_id"
+      requestBody:
+        required: true
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              properties:
+                password:
+                  type: string
+                  description: 変更前のパスワード
+                new_password:
+                  type: string
+                  description: 新しいパスワード
+              required:
+                - password
+                - new_password
+      responses:
+        '401':
+          description: パスワード間違い
+  /accounts/{account_id}/words:
+    post:
+      tags:
+        - accounts
+      summary: 新しい単語の追加
+      description: 新しい英単語と日本語訳を追加する
+      parameters:
+        - $ref: "#/components/parameters/account_id"
+      requestBody:
+        required: false
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              properties:
+                en:
+                  type: string
+                  description: 英単語
+                jp:
+                  type: string
+                  description: 日本語訳
+              required:
+                - en
+                - jp
+      responses:
+        '200':
+          description: 成功
+        '409':
+          description: すでにenが存在したとき
+    delete:
+      tags:
+        - accounts
+      summary: 単語の削除
+      description: 英単語と日本語訳を削除する
+      parameters:
+        - $ref: "#/components/parameters/account_id"
+        - in: query
+          name: en
+          schema:
+            type: string
+          required: true
+          description: 削除したい英単語
+          example: cosmology
+      responses:
+        '200':
+          description: 成功
+        '404':
+          description: 指定された単語が単語帳に存在しない
