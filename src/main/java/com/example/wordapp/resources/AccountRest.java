@@ -85,7 +85,7 @@ public class AccountRest {
     @Path("/{account_id}/words")
     @POST
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
-    public void addWord(@FormParam("new_English_word") String newEnWord,
+    public void addWord(@FormParam("English_word") String newEnWord,
                          @FormParam("new_Japanese_meaning") String JpMeaning,
                          @PathParam("account_id") String accountId,
                          @FormParam("password") String password) {
@@ -108,10 +108,26 @@ public class AccountRest {
             // 英単語が既に存在した場合
             if (words.containsKey(newEnWord)) {
                 var response = Response.status(Response.Status.CONFLICT)  // 409
-                        .entity("id '" + accountId + "' は既に存在します");  // postmanにこう表示される
+                        .entity("word '" + newEnWord + "' は既に存在します");  // postmanにこう表示される
                 throw new WebApplicationException(response.build());
             }
             words.put(newEnWord, JpMeaning);
         }
+    }
+    @Path("/{account_id}/words")
+    @DELETE
+    public void deleteWord (@PathParam("account_id") String accountId, @QueryParam("English_word") String Enword, @QueryParam("password") String password) {
+        if (!accounts.get(accountId).getPassword().equals(password)) {
+            var response = Response.status(Response.Status.UNAUTHORIZED)
+                    .entity("パスワードが違います");
+            throw new WebApplicationException(response.build());
+        }
+        Account account = accounts.get(accountId);
+        HashMap<String, String> words = account.getWords();
+        if (!words.containsKey(Enword)) {
+            var response = Response.status(Response.Status.NOT_FOUND).entity("その英単語は存在しません");
+            throw new WebApplicationException(response.build());
+        }
+        String removedWord = words.remove(Enword);
     }
 }
