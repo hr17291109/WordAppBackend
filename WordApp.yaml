@@ -17,6 +17,21 @@ components:
       required: true
 paths:
   /accounts:
+    get:
+      tags:
+        - accounts
+      summary: アカウントの一覧を返す
+      description: アカウントの一覧をリストとして返す
+      responses:
+        '200':
+          description: 成功
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string
+                  example: id1
     post:
       tags:
         - accounts
@@ -80,17 +95,17 @@ paths:
                     items:
                       type: object
                       properties:
-                        en:
+                        English_word:
                           type: string
                           description: 英単語
                           example: cosmology
-                        jp:
+                        new_Japanese_meaning:
                           type: string
                           description: 日本語訳
                           example: 宇宙論
                       required:
-                        - en
-                        - jp
+                        - English_word
+                        - new_Japanese_meaning
         '401':
           description: パスワード間違い
         '404':
@@ -131,26 +146,32 @@ paths:
       parameters:
         - $ref: "#/components/parameters/account_id"
       requestBody:
-        required: false
+        required: true
         content:
           application/x-www-form-urlencoded:
             schema:
               type: object
               properties:
-                en:
+                password:
+                  type: string
+                  description: パスワード
+                English_word:
                   type: string
                   description: 英単語
-                jp:
+                new_Japanese_meaning:
                   type: string
                   description: 日本語訳
               required:
-                - en
-                - jp
+                - password
+                - English_word
+                - new_Japanese_meaning
       responses:
         '200':
           description: 成功
         '409':
           description: すでにenが存在したとき
+        '401':
+          description: パスワード間違い
     delete:
       tags:
         - accounts
@@ -159,14 +180,22 @@ paths:
       parameters:
         - $ref: "#/components/parameters/account_id"
         - in: query
-          name: en
+          name: English_word
           schema:
             type: string
           required: true
           description: 削除したい英単語
           example: cosmology
+        - in: query
+          name: password
+          schema:
+            type: string
+          description: パスワード
+          required: true
       responses:
         '200':
           description: 成功
         '404':
           description: 指定された単語が単語帳に存在しない
+        '401':
+          description: パスワード間違い
