@@ -5,22 +5,22 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import java.util.HashMap;
 
 public class Account {
-    private String account_id;
+    private String accountId;
     @JsonIgnore
     private String password;
     private final HashMap<String, String> wordDic = new HashMap<String, String>();
 
     public Account(String aid, String pass) {
-        account_id = aid;
+        accountId = aid;
         password = pass;
     }
 
-    public String getAccount_id() {
-        return account_id;
+    public String getAccountId() {
+        return accountId;
     }
 
-    public void setAccount_id(String account_id) {
-        this.account_id = account_id;
+    public void setAccountId(String accountId) {
+        this.accountId = accountId;
     }
 
     public void setPassword(String p) {
